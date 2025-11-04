@@ -1,0 +1,24 @@
+[package]
+name = "caretta-agent"
+edition.workspace = true
+version.workspace = true
+description.workspace = true
+license.workspace = true
+repository.workspace = true
+exclude = [".gitignore"]
+
+[dependencies]
+caretta-agent-core.workspace = true
+
+[workspace]
+members = [".", "core", "mobile"]
+
+[workspace.package]
+edition = "2024"
+version = "0.0.0"
+description = "An AI agent frontend with serverless synchronization via caretta-sync"
+license = "GPL-3.0-or-later"
+repository = "https://github.com/fluo10/caretta-agent" 
+
+[workspace.dependencies]
+caretta-agent-core = {path = "core", version = "0.0.0"}

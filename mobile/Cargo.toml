@@ -1,0 +1,10 @@
+[package]
+name = "caretta-agent-mobile"
+edition.workspace = true
+version.workspace = true
+description.workspace = true
+license.workspace = true
+repository.workspace = true
+
+[dependencies]
+caretta-agent-core.workspace = true
