@@ -3,19 +3,19 @@
 version = 4
 
 [[package]]
-name = "caretta-agent"
+name = "caretta-brain"
 version = "0.0.0"
 dependencies = [
- "caretta-agent-core",
+ "caretta-brain-core",
 ]
 
 [[package]]
-name = "caretta-agent-core"
+name = "caretta-brain-core"
 version = "0.0.0"
 
 [[package]]
-name = "caretta-agent-mobile"
+name = "caretta-brain-mobile"
 version = "0.0.0"
 dependencies = [
- "caretta-agent-core",
+ "caretta-brain-core",
 ]

@@ -1,2 +1,2 @@
-# caretta-agent
-An AI agent frontend with serverless synchronization via caretta-sync
+# caretta-brain
+Your AI-powered second brain with serverless sync

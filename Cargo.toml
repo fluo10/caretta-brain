@@ -1,5 +1,5 @@
 [package]
-name = "caretta-agent"
+name = "caretta-brain"
 edition.workspace = true
 version.workspace = true
 description.workspace = true
@@ -8,7 +8,7 @@ repository.workspace = true
 exclude = [".gitignore"]
 
 [dependencies]
-caretta-agent-core.workspace = true
+caretta-brain-core.workspace = true
 
 [workspace]
 members = [".", "core", "mobile"]
@@ -16,9 +16,9 @@ members = [".", "core", "mobile"]
 [workspace.package]
 edition = "2024"
 version = "0.0.0"
-description = "An AI agent frontend with serverless synchronization via caretta-sync"
+description = "Your AI-powered second brain with serverless sync"
 license = "GPL-3.0-or-later"
-repository = "https://github.com/fluo10/caretta-agent" 
+repository = "https://github.com/fluo10/caretta-brain" 
 
 [workspace.dependencies]
-caretta-agent-core = {path = "core", version = "0.0.0"}
+caretta-brain-core = {path = "core", version = "0.0.0"}

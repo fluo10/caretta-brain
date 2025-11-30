@@ -1,5 +1,5 @@
 [package]
-name = "caretta-agent-mobile"
+name = "caretta-brain-mobile"
 edition.workspace = true
 version.workspace = true
 description.workspace = true
@@ -7,4 +7,4 @@ license.workspace = true
 repository.workspace = true
 
 [dependencies]
-caretta-agent-core.workspace = true
+caretta-brain-core.workspace = true

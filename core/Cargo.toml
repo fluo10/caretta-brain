@@ -1,5 +1,5 @@
 [package]
-name = "caretta-agent-core"
+name = "caretta-brain-core"
 edition.workspace = true
 version.workspace = true
 description.workspace = true
