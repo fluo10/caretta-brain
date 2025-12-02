@@ -9,5 +9,4 @@ mod p2p_config;
 mod tag;
 mod tag_thread;
 mod thread;
-mod types;
 mod workspace;

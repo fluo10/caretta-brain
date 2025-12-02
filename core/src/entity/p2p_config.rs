@@ -1,7 +1,6 @@
-use iroh::SecretKey;
 use sea_orm::{ActiveValue::Set, entity::prelude::*};
 
-use crate::entity::types::SecretKeyBlob;
+use crate::types::SecretKey;
 
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel)]
@@ -10,7 +9,7 @@ pub struct Model {
     #[sea_orm(primary_key)]
     pub id: u32,
     pub enabled: bool,
-    pub secret_key: SecretKeyBlob,
+    pub secret_key: SecretKey,
     pub enable_n0: bool,
     pub enable_mdns: bool,
 }
@@ -25,7 +24,7 @@ impl Model {
             Ok(ActiveModel {
                 id: Set(Self::ID),
                 enabled: Set(true),
-                secret_key: Set(SecretKey::generate(&mut rand::rng()).into()),
+                secret_key: Set(SecretKey::from(iroh::SecretKey::generate(&mut rand::rng()))),
                 enable_n0: Set(true),
                 enable_mdns: Set(true),
             }

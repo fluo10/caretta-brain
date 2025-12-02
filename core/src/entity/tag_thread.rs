@@ -9,9 +9,9 @@ pub struct Model {
     #[sea_orm(primary_key, auto_increment = false)]
     pub thread_id: Uuid,
     #[sea_orm(belongs_to, from = "thread_id", to = "id")]
-    pub thread: Option<super::note::Entity>,
-    #[sea_orm(belongs_to, from = "tab_id", to = "id")]
-    pub tag: Option<super::tag::Entity>,
+    pub thread: HasOne<super::thread::Entity>,
+    #[sea_orm(belongs_to, from = "tag_id", to = "id")]
+    pub tag: HasOne<super::tag::Entity>,
 }
 
 impl ActiveModelBehavior for ActiveModel {}
