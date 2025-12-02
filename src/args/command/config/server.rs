@@ -1,0 +1,22 @@
+use std::marker::PhantomData;
+
+use caretta_brain_core::util::RunnableCommand;
+use clap::Args;
+
+use crate::args::ConfigArgs;
+
+#[derive(Debug, Args)]
+pub struct ConfigServerCommandArgs {
+    #[command(flatten)]
+    config: ConfigArgs,
+    /// Include default config.
+    #[arg(short, long)]
+    all: bool,
+}
+
+impl RunnableCommand for ConfigServerCommandArgs {
+    #[tokio::main]
+    async fn run(self, app_name: &'static str) {
+        todo!()
+    }
+}

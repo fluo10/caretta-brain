@@ -7,8 +7,31 @@ license.workspace = true
 repository.workspace = true
 exclude = [".gitignore"]
 
+[[bin]]
+name = "caretta-brain-server"
+path = "src/bin/server.rs"
+
+[[bin]]
+name = "cbcli"
+path = "src/bin/cli.rs"
+
+[[bin]]
+name = "caretta-brain"
+path = "src/bin/gui.rs"
+
+[features]
+cli = []
+server = []
+gui = []
+
 [dependencies]
 caretta-brain-core.workspace = true
+clap = { version = "4.5.53", features = ["derive"] }
+serde.workspace = true
+thiserror.workspace = true
+tracing.workspace = true
+tracing-subscriber.workspace = true
+
 
 [workspace]
 members = [".", "core", "mobile"]
@@ -22,3 +45,7 @@ repository = "https://github.com/fluo10/caretta-brain"
 
 [workspace.dependencies]
 caretta-brain-core = {path = "core", version = "0.0.0"}
+serde = { version = "1.0.228", features = ["derive"] }
+thiserror = "2.0.17"
+tracing = "0.1.43"
+tracing-subscriber = "0.3.22"
