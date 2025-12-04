@@ -1,18 +1,17 @@
-use iroh::SecretKey;
 use sea_orm::{ActiveValue::Set, entity::prelude::*};
 
-use crate::entity::types::SecretKeyBlob;
+use crate::types::{IrohEndpointSecret};
 
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel)]
-#[sea_orm(table_name = "p2p_config")]
+#[sea_orm(table_name = "device_config")]
 pub struct Model {
     #[sea_orm(primary_key)]
     pub id: u32,
-    pub enabled: bool,
-    pub secret_key: SecretKeyBlob,
-    pub enable_n0: bool,
-    pub enable_mdns: bool,
+    pub p2p_enabled: bool,
+    pub p2p_secret_key: IrohEndpointSecret,
+    pub p2p_enable_n0: bool,
+    pub p2p_enable_mdns: bool,
 }
 
 impl Model {
@@ -24,10 +23,10 @@ impl Model {
         } else {
             Ok(ActiveModel {
                 id: Set(Self::ID),
-                enabled: Set(true),
-                secret_key: Set(SecretKey::generate(&mut rand::rng()).into()),
-                enable_n0: Set(true),
-                enable_mdns: Set(true),
+                p2p_enabled: Set(true),
+                p2p_secret_key: Set(IrohEndpointSecret::generate()),
+                p2p_enable_n0: Set(true),
+                p2p_enable_mdns: Set(true),
             }
             .insert(db)
             .await?)

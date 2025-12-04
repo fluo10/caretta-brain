@@ -9,6 +9,8 @@ pub struct Model {
     pub name: String,
     #[sea_orm(has_one)]
     pub workspace: HasOne<super::workspace::Entity>,
+    #[sea_orm(has_many, via = "tag_thread")]
+    pub threads: HasMany<super::thread::Entity>,
 }
 
 impl ActiveModelBehavior for ActiveModel {}
