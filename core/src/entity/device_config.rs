@@ -1,6 +1,6 @@
 use sea_orm::{ActiveValue::Set, entity::prelude::*};
 
-use crate::types::{IrohEndpointSecret};
+use crate::types::{EndpointSecretKey};
 
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel)]
@@ -8,10 +8,9 @@ use crate::types::{IrohEndpointSecret};
 pub struct Model {
     #[sea_orm(primary_key)]
     pub id: u32,
-    pub p2p_enabled: bool,
-    pub p2p_secret_key: IrohEndpointSecret,
-    pub p2p_enable_n0: bool,
-    pub p2p_enable_mdns: bool,
+    pub iroh_endpoint_secret: EndpointSecretKey,
+    pub iroh_enable_n0: bool,
+    pub iroh_enable_mdns: bool,
 }
 
 impl Model {
@@ -23,10 +22,9 @@ impl Model {
         } else {
             Ok(ActiveModel {
                 id: Set(Self::ID),
-                p2p_enabled: Set(true),
-                p2p_secret_key: Set(IrohEndpointSecret::generate()),
-                p2p_enable_n0: Set(true),
-                p2p_enable_mdns: Set(true),
+                iroh_endpoint_secret: Set(EndpointSecretKey::new()),
+                iroh_enable_n0: Set(true),
+                iroh_enable_mdns: Set(true),
             }
             .insert(db)
             .await?)
@@ -39,3 +37,16 @@ pub enum Relation{}
 
 impl ActiveModelBehavior for ActiveModel {}
 
+#[cfg(test)]
+mod tests {
+    use crate::context::ServiceContextExt;
+
+    use super::*;
+
+    #[tokio::test]
+    async fn insert_and_get_record() {
+        let db = crate::tests::service_conext().await.as_database_connection();
+        let model = Model::get_or_try_init(db).await.unwrap();
+        assert_eq!(model, Model::get_or_try_init(db).await.unwrap());
+    }
+}
