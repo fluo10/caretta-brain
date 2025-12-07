@@ -1,6 +1,6 @@
 use sea_orm::{ActiveValue::Set, entity::prelude::*};
 
-use crate::types::{EndpointSecretKey};
+use crate::{config::P2pConfig, types::EndpointSecretKey};
 
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel)]
@@ -36,6 +36,16 @@ impl Model {
 pub enum Relation{}
 
 impl ActiveModelBehavior for ActiveModel {}
+
+impl From<Model> for P2pConfig {
+    fn from(value: Model) -> Self {
+        P2pConfig {
+            secret_key: value.iroh_endpoint_secret,
+            enable_mdns: value.iroh_enable_mdns,
+            enable_n0: value.iroh_enable_n0,
+        }
+    }
+}
 
 #[cfg(test)]
 mod tests {

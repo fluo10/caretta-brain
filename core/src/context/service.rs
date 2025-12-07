@@ -12,12 +12,12 @@ use crate::config::{LogConfig, P2pConfig, StorageConfig};
 
 /// An extension trait for [`ServiceContext`]
 pub trait ServiceContextExt {
-    fn as_iroh_router(&self) -> Option<&Router>;
-    fn as_endpoint(&self) -> Option<&Endpoint> {
-        self.as_iroh_router().map(|x| x.endpoint())
+    fn as_iroh_router(&self) -> &Router;
+    fn as_endpoint(&self) -> &Endpoint {
+        self.as_iroh_router().endpoint()
     }
-    fn as_discovery(&self) -> Option<&ConcurrentDiscovery> {
-        self.as_endpoint().map(|x| x.discovery())
+    fn as_discovery(&self) -> &ConcurrentDiscovery {
+        self.as_endpoint().discovery()
     }
     async fn discover(
         &self,
@@ -31,11 +31,7 @@ pub trait ServiceContextExt {
             >,
         >,
     > {
-        if let Some(x) = self.as_discovery() {
-            x.resolve(endpoint_id)
-        } else {
-            None
-        }
+        self.as_discovery().resolve(endpoint_id)
     }
     fn as_database_connection(&self) -> &DatabaseConnection;
 
@@ -45,7 +41,7 @@ impl<T> ServiceContextExt for T
 where
     T: AsRef<ServiceContext>,
 {
-    fn as_iroh_router(&self) -> Option<&Router> {
+    fn as_iroh_router(&self) -> &Router {
         self.as_ref().as_iroh_router()
     }
     fn as_database_connection(&self) -> &DatabaseConnection {
@@ -59,26 +55,13 @@ pub struct ServiceContext {
     pub app_name: &'static str,
     pub storage_config: StorageConfig,
     pub database_connection: DatabaseConnection,
-    pub iroh_router: Option<Router>,
+    pub iroh_router: Router,
 }
 impl ServiceContextExt for ServiceContext {
-    fn as_iroh_router(&self) -> Option<&Router> {
-        self.iroh_router.as_ref()
+    fn as_iroh_router(&self) -> &Router {
+        &self.iroh_router
     }
     fn as_database_connection(&self) -> &DatabaseConnection {
         &self.database_connection
-    }
-}
-impl From<&ServiceContext> for Option<Endpoint> {
-    fn from(value: &ServiceContext) -> Self {
-        value.iroh_router.as_ref().map(|x| x.endpoint().clone())
-    }
-}
-impl From<&ServiceContext> for Option<ConcurrentDiscovery> {
-    fn from(value: &ServiceContext) -> Self {
-        value
-            .iroh_router
-            .as_ref()
-            .map(|x| x.endpoint().discovery().clone())
     }
 }

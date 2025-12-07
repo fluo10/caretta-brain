@@ -1,6 +1,8 @@
 use std::{marker::PhantomData, sync::LazyLock};
 
-use crate::{config::StorageConfig, context::ServiceContext};
+use crate::{config::{P2pConfig, StorageConfig}, context::ServiceContext, entity::device_config};
+use caretta_brain_migration::Migrator;
+use sea_orm::DatabaseConnection;
 use tokio::sync::OnceCell;
 
 const TEST_APP_NAME: &str = "caretta-brain-test";
@@ -20,8 +22,9 @@ pub async fn service_conext() -> &'static ServiceContext {
                 data_dir,
                 cache_dir,
             };
-            let database_connection = storage_config.to_database_connection();
-            let iroh_router = None;
+            let database_connection = storage_config.to_database_connection(Migrator).await;
+            let device_config = device_config::Model::get_or_try_init(&database_connection).await.unwrap();
+            let iroh_router = P2pConfig::from(device_config).to_iroh_router(TEST_APP_NAME).await.unwrap();
             ServiceContext {
                 app_name: TEST_APP_NAME,
                 storage_config,

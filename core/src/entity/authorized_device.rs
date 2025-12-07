@@ -25,7 +25,7 @@ impl Model {
         ActiveModel {
             id: ActiveValue::Set(Uuid::now_v7()),
             public_id: ActiveValue::Set(CarettaId::now_unix()),
-            public_key: ActiveValue::Set(ctx.as_iroh_router().unwrap().endpoint().id().into()),
+            public_key: ActiveValue::Set(ctx.as_iroh_router().endpoint().id().into()),
             name: ActiveValue::Set(gethostname::gethostname().to_string_lossy().to_string()),
             created_at: ActiveValue::Set(Local::now()),
             updated_at: ActiveValue::Set(Local::now()),

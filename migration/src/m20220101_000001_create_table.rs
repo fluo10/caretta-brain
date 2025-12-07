@@ -12,7 +12,7 @@ impl MigrationTrait for Migration {
                 db.execute_unprepared(
                     "CREATE TABLE invitation_token (
                         id             INTEGER PRIMARY KEY,
-                        public_id      INTEGER NOT NULL UNIQUE,
+                        secret         INTEGER NOT NULL,
                         created_at     TEXT NOT NULL,
                         closed_at      TEXT,
                         status         INTEGER NOT NULL
@@ -31,12 +31,11 @@ impl MigrationTrait for Migration {
                 )
                 .await?;
                 db.execute_unprepared(
-                    "CREATE TABLE p2p_config (
+                    "CREATE TABLE device_config (
                         id INTEGER PRIMARY KEY CHECK (id = 0),
-                        enabled     BOOL NOT NULL,
-                        secret_key  BLOB NOT NULL,
-                        enable_n0   BOOL NOT NULL,
-                        enable_mdns BOOL NOT NULL
+                        iroh_endpoint_secret  BLOB NOT NULL,
+                        iroh_enable_n0   BOOL NOT NULL,
+                        iroh_enable_mdns BOOL NOT NULL
                     )",
                 )
                 .await?;

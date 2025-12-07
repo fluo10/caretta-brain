@@ -2,7 +2,8 @@ use std::{marker::PhantomData, path::{Path, PathBuf}};
 
 use crate::util::{Emptiable, Mergeable};
 
-use sea_orm::DatabaseConnection;
+use sea_orm::{Database, DatabaseConnection, sqlx::sqlite::SqliteConnectOptions};
+use sea_orm_migration::MigratorTrait;
 #[cfg(any(test, feature = "test"))]
 use tempfile::tempdir;
 
@@ -41,8 +42,13 @@ impl StorageConfig {
     ///
     /// # Panic
     /// If initialize database is failed, then panic.
-    pub fn to_database_connection(&self) -> DatabaseConnection
+    pub async fn to_database_connection<M>(&self, _: M) -> DatabaseConnection
+    where
+        M: MigratorTrait
     {
-        todo!()
+        let options = ["sqlite://", &self.to_database_path().to_string_lossy(), "?mode=rwc"].join("");
+        let db = Database::connect(&options).await.expect("Failed to open database file");
+        M::up(&db, None).await.expect("Failed to migrate database");
+        db
     }
 }
