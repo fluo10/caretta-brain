@@ -82,6 +82,7 @@ macro_rules! impl_iroh_public_key {
         TryIntoError = $TryIntoError:ty,
     } => {
         impl $SelfT {
+            pub const LENGTH:usize = 32;
             pub fn into_inner(self) -> $Inner {
                 self.0
             }

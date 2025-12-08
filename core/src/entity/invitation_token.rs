@@ -10,7 +10,7 @@ use crate::{context::ServiceContextExt, types::TokenStatus};
 #[sea_orm(table_name = "invitation_token")]
 pub struct Model {
     #[sea_orm(primary_key)]
-    pub id: u32,
+    pub id: CarettaId,
     pub secret: i64,
     pub created_at: chrono::DateTime<Local>,
     pub closed_at: Option<chrono::DateTime<Local>>,
@@ -30,7 +30,7 @@ impl Model {
             ..Default::default()
         }.insert(ctx.as_database_connection()).await
     }
-    async fn from_db<C>(ctx: &C, id: u32) -> Result<Option<Self>, DbErr>
+    async fn from_db<C>(ctx: &C, id: CarettaId) -> Result<Option<Self>, DbErr>
     where
         C: ServiceContextExt
     {

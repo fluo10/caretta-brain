@@ -1,6 +1,6 @@
 use std::{sync::Arc, time::Duration};
 
-use crate::{context::{ServiceContext, ServiceContextExt}, ipc::{DevicePingRequest, DevicePingResponse, IpcActorError, IpcApi, IpcApiTrait, IpcError, IpcMessage}, types::DeviceIdentifier};
+use crate::{context::{ServiceContext, ServiceContextExt}, entity::{authorized_device, invitation_token}, ipc::{DevicePingRequest, DevicePingResponse, IpcActorError, IpcApi, IpcApiTrait, IpcError, IpcMessage}, types::{DeviceIdentifier, InvitationToken}};
 use irpc::{Client, Service, WithChannels};
 use n0_future::StreamExt;
 use tracing::info;
@@ -45,6 +45,14 @@ impl IpcActor {
 #[async_trait::async_trait]
 impl IpcApiTrait for IpcActor {
     type Error = IpcActorError;
+    async fn device_get(&self, target: DeviceIdentifier) -> Result<authorized_device::Model, Self::Error> {
+        todo!();
+    }
+    
+    async fn device_list(&self) -> Result<Vec<authorized_device::Model>, Self::Error>{
+        todo!();
+    }
+
     async fn device_ping(&self, target: DeviceIdentifier) -> Result<Duration, Self::Error>{
                 let public_key = target
             .to_public_key(&self.context)
@@ -61,7 +69,7 @@ impl IpcApiTrait for IpcActor {
             let discovered = x.map_err(|e| IpcActorError::Internal(format!("{:?}", e).to_string()))?;
             iroh_ping::Ping::new()
                 .ping(
-                    self.context.as_ref().as_endpoint().unwrap(),
+                    self.context.as_ref().as_endpoint(),
                     discovered.into_endpoint_addr(),
                 )
                 .await
@@ -69,5 +77,33 @@ impl IpcApiTrait for IpcActor {
         } else {
             unreachable!()
         }
+    }
+
+    async fn device_remove(&self, target: DeviceIdentifier) -> Result<(), Self::Error> {
+        todo!();
+    }
+
+    async fn token_get(&self, id: u32) -> Result<invitation_token::Model, Self::Error>{
+        todo!();
+    }
+
+    async fn token_list(&self) -> Result<Vec<invitation_token::Model>, Self::Error> {
+        todo!();
+    }
+
+    async fn token_revoke(&self, id: u32) -> Result<(), Self::Error> {
+        todo!();
+    }
+
+    async fn init(&self) -> Result<(), Self::Error> {
+        todo!();
+    }
+    
+    async fn invite(&self) -> Result<InvitationToken, Self::Error> {
+        todo!();
+    }
+
+    async fn join(&self, token: InvitationToken) -> Result<(), Self::Error> {
+        todo!();
     }
 }
