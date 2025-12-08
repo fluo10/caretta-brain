@@ -15,7 +15,7 @@ mobile = ["service"]
 
 [dependencies]
 base32 = "0.5.1"
-caretta-id = { version = "0.11.0-rc", features = [ "sea-orm", "serde" ] }
+caretta-id = { version = "0.11.0-rc.1", features = [ "sea-orm", "serde" ] }
 caretta-brain-migration.workspace = true
 chrono.workspace = true
 ciborium = "0.2.2"

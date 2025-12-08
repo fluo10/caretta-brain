@@ -545,9 +545,9 @@ dependencies = [
 
 [[package]]
 name = "caretta-id"
-version = "0.11.0-rc"
+version = "0.11.0-rc.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "01be51f36c3d1a7c2357297e213cf72d628840f24541fa66f631aed8d9cb2bc9"
+checksum = "8cc6ccee8001b6cd50e689efcaf1c8961a24bab847834eed5bec6f9dd8195fa6"
 dependencies = [
  "prost-build",
  "rand 0.9.2",
