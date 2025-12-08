@@ -7,22 +7,17 @@ use sea_orm::{
 };
 use serde::{Deserialize, Serialize};
 
-new_type!{
+use crate::util::DecodeBase32Error;
+
+crate::types::macros::def_iroh_public_key!{
     Self = NamespacePublicKey,
-    Inner = iroh_docs::NamespacePublicKey
+    Inner = iroh_docs::NamespacePublicKey,
+    TryIntoError = TryIntoNamespacePublicKeyError,
+    InvalidBytesValueInner = ed25519_dalek::SignatureError
 }
 
 impl_iroh_public_key!{
     Self = NamespacePublicKey,
     Inner = iroh_docs::NamespacePublicKey,
     TryIntoError = TryIntoNamespacePublicKeyError,
-}
-
-
-#[derive(Debug, thiserror::Error)]
-pub enum TryIntoNamespacePublicKeyError {
-    #[error("invalid length {0}")]
-    InvalidLength(#[from] TryFromSliceError),
-    #[error("invalid value {0}")]
-    InvalidValue(#[from] ed25519_dalek::SignatureError),
 }

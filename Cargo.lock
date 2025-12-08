@@ -502,6 +502,7 @@ dependencies = [
 name = "caretta-brain-core"
 version = "0.0.0"
 dependencies = [
+ "async-trait",
  "base32",
  "caretta-brain-migration",
  "caretta-id",

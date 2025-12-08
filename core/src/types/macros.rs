@@ -1,3 +1,80 @@
+macro_rules! def_new_type {
+    { 
+        Self = $SelfT:ident,
+        Inner = $Inner:ty
+    } => {
+        #[doc = concat!("A wrapper struct of [`", stringify!($Inner), "`]")]
+        ///
+        /// 
+        ///
+        /// # Examples
+        /// 
+        /// ## Sea ORM
+        /// ```
+        /// # use sea_orm::entity::prelude::*;
+        #[doc = concat!("use caretta_brain::types::", stringify!($Inner), ";")]
+        /// #[derive(Clone, Debug, PartialEq, DeriveEntityModel)]
+        /// #[sea_orm(table_name = "example")]
+        /// pub struct Model {
+        ///     #[sea_orm(primary_key)]
+        ///     pub id: u32,
+        #[doc = concat!("pub value: ", stringify!($Self), ",")] 
+        /// }
+        /// # #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
+        /// # pub enum Relation {}
+        /// #
+        /// # impl ActiveModelBehavior for ActiveModel{}
+        /// ```
+        #[derive(Clone, Debug)]
+        pub struct $SelfT($Inner);
+    };
+}
+
+macro_rules! def_iroh_public_key {
+    { 
+        Self = $SelfT:ident,
+        Inner = $Inner:ty,
+        TryIntoError = $TryIntoError:ident,
+        InvalidBytesValueInner = $InvalidBytesValueInner:ty
+    } => {
+        crate::types::macros::def_new_type!(
+            Self = $SelfT,
+            Inner = $Inner
+        );
+
+        #[derive(Debug, thiserror::Error)]
+        pub enum $TryIntoError{
+            #[error("Expected base32 string, found {0}")]
+            InvalidBase32String(#[from] DecodeBase32Error),
+            #[error("invalid length {0}")]
+            InvalidBytesLength(#[from] TryFromSliceError),
+            #[error("invalid value {0}")]
+            InvalidBytesValue(#[from] $InvalidBytesValueInner),
+        }
+    };
+}
+
+
+macro_rules! def_iroh_secret_key {
+    { 
+        Self = $SelfT:ident,
+        Inner = $Inner:ty,
+        TryIntoError = $TryIntoError:ident
+    } => {
+        crate::types::macros::def_new_type!(
+            Self = $SelfT,
+            Inner = $Inner
+        );
+        #[derive(Debug, thiserror::Error)]
+        pub enum $TryIntoError{
+            #[error("Expected base32 string, found {0}")]
+            InvalidString(#[from] crate::util::DecodeBase32Error),
+            #[error("Invalid slice length: {0}")]
+            InvalidSliceLength(#[from] std::array::TryFromSliceError),
+        }
+    };
+}
+
 macro_rules! impl_iroh_public_key {
     {
         Self = $SelfT:ty,
@@ -46,6 +123,21 @@ macro_rules! impl_iroh_public_key {
             fn try_from(value: &[u8]) -> Result<Self, Self::Error> {
                 let slice: [u8; 32] = value[0..32].try_into()?;
                 Ok(Self::from_bytes(&slice)?)
+            }
+        }
+
+        impl std::fmt::Display for $SelfT {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+                write!(f, "{}", &crate::util::encode_base32(self.as_bytes()))
+            }
+        }
+
+        impl std::str::FromStr for $SelfT {
+            type Err = $TryIntoError;
+            fn from_str(s: &str) -> Result<Self, Self::Err> {
+                let v = crate::util::decode_base32(s)?;
+                let slice: &[u8;32] = v.as_slice().try_into()?;
+                <$SelfT>::from_bytes(slice)
             }
         }
 
@@ -222,37 +314,10 @@ macro_rules! impl_iroh_secret_key {
     }
 }
 
-macro_rules! new_type {
-    { 
-        Self = $SelfT:ident,
-        Inner = $Inner:ty
-    } => {
-        #[doc = concat!("A wrapper struct of [`", stringify!($Inner), "`]")]
-        ///
-        /// 
-        ///
-        /// # Examples
-        /// 
-        /// ## Sea ORM
-        /// ```
-        /// # use sea_orm::entity::prelude::*;
-        #[doc = concat!("use caretta_brain::types::", stringify!($Inner), ";")]
-        /// #[derive(Clone, Debug, PartialEq, DeriveEntityModel)]
-        /// #[sea_orm(table_name = "example")]
-        /// pub struct Model {
-        ///     #[sea_orm(primary_key)]
-        ///     pub id: u32,
-        #[doc = concat!("pub value: ", stringify!($Self), ",")] 
-        /// }
-        /// # #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
-        /// # pub enum Relation {}
-        /// #
-        /// # impl ActiveModelBehavior for ActiveModel{}
-        /// ```
-        #[derive(Clone, Debug)]
-        pub struct $SelfT($Inner);
-    };
-}
+
+
+pub(crate) use def_iroh_public_key;
+pub(crate) use def_iroh_secret_key;
 pub(crate) use impl_iroh_public_key;
 pub(crate) use impl_iroh_secret_key;
-pub(crate) use new_type;
+pub(crate) use def_new_type;

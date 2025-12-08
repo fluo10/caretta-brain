@@ -7,22 +7,17 @@ use sea_orm::{
 };
 use serde::{Deserialize, Serialize};
 
-new_type!{
+use crate::util::DecodeBase32Error;
+
+crate::types::macros::def_iroh_public_key!{
     Self = EndpointPublicKey,
-    Inner = iroh::PublicKey
+    Inner = iroh::PublicKey,
+    TryIntoError = TryIntoEndpointPublicKeyError,
+    InvalidBytesValueInner = iroh::KeyParsingError
 }
 
 impl_iroh_public_key!{
     Self = EndpointPublicKey,
     Inner = iroh::PublicKey,
     TryIntoError = TryIntoEndpointPublicKeyError,
-}
-
-
-#[derive(Debug, thiserror::Error)]
-pub enum TryIntoEndpointPublicKeyError {
-    #[error("invalid length {0}")]
-    InvalidLength(#[from] TryFromSliceError),
-    #[error("invalid value {0}")]
-    InvalidValue(#[from] KeyParsingError),
 }

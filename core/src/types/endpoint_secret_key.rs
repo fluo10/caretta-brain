@@ -6,9 +6,10 @@ use sea_orm::{
 };
 use serde::{Deserialize, Serialize};
 
-new_type!{
+crate::types::macros::def_iroh_secret_key!{
     Self = EndpointSecretKey,
-    Inner = iroh::SecretKey
+    Inner = iroh::SecretKey,
+    TryIntoError = TryIntoEndpointSecretKeyError
 }
 
 impl_iroh_secret_key!{
@@ -17,7 +18,3 @@ impl_iroh_secret_key!{
     TryIntoError = TryIntoEndpointSecretKeyError,
     new = iroh::SecretKey::generate
 }
-
-#[derive(Debug, thiserror::Error)]
-#[error("Failed to convert to EndpointSecret: {0}")]
-pub struct TryIntoEndpointSecretKeyError(#[from] TryFromSliceError);

@@ -6,9 +6,10 @@ use sea_orm::{
 };
 use serde::{Deserialize, Serialize};
 
-new_type!{
+crate::types::macros::def_iroh_secret_key!{
     Self = NamespaceSecretKey,
-    Inner = iroh_docs::NamespaceSecret
+    Inner = iroh_docs::NamespaceSecret,
+    TryIntoError = TryIntoNamespaceSecretKeyError
 }
 
 impl_iroh_secret_key!{
@@ -17,6 +18,3 @@ impl_iroh_secret_key!{
     TryIntoError = TryIntoNamespaceSecretKeyError,
     new = iroh_docs::NamespaceSecret::new
 }
-#[derive(Debug, thiserror::Error)]
-#[error("Failed to convert to NamespaceSecret: {0}")]
-pub struct TryIntoNamespaceSecretKeyError(#[from] TryFromSliceError);

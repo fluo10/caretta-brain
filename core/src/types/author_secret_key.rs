@@ -6,9 +6,12 @@ use sea_orm::{
 };
 use serde::{Deserialize, Serialize};
 
-super::macros::new_type!{
+use crate::util::DecodeBase32Error;
+
+super::macros::def_iroh_secret_key!{
     Self = AuthorSecretKey,
-    Inner = iroh_docs::Author
+    Inner = iroh_docs::Author,
+    TryIntoError = TryIntoAuthorSecretKeyError
 }
 
 super::macros::impl_iroh_secret_key!{
@@ -18,6 +21,3 @@ super::macros::impl_iroh_secret_key!{
     new = iroh_docs::Author::new
 }
 
-#[derive(Debug, thiserror::Error)]
-#[error("Failed to convert to AuthorSecret: {0}")]
-pub struct TryIntoAuthorSecretKeyError(#[from] TryFromSliceError);
