@@ -28,7 +28,7 @@ impl InvitationToken {
     pub fn to_bytes(&self) -> [u8; Self::LENGTH] {
         let mut buf = [0u8; Self::LENGTH];
         buf[Self::TOKEN_ID_START..Self::TOKEN_ID_END]
-            .copy_from_slice(&u64::from(self.token_id).to_be_bytes());
+            .copy_from_slice(&self.token_id.to_be_bytes_compact());
         buf[Self::SECRET_START..Self::SECRET_END]
             .copy_from_slice(&self.secret.to_be_bytes());
         buf[Self::ENDPOINT_ID_START..Self::ENDPOINT_ID_END]
@@ -37,14 +37,13 @@ impl InvitationToken {
     }
 
     pub fn from_bytes(bytes: [u8; Self::LENGTH]) -> Result<Self, TryIntoInvitationTokenError> {
-        let token_id = u64::from_be_bytes(
+        let token_id = CarettaId::from_be_bytes_compact_lossy(
             bytes[Self::TOKEN_ID_START..Self::TOKEN_ID_END]
             .try_into()
                 .unwrap(),
-            )
-            .try_into()?;
+        );
         let secret = i64::from_be_bytes(
-            bytes[Self::TOKEN_ID_START..Self::TOKEN_ID_END]
+            bytes[Self::SECRET_START..Self::SECRET_END]
                 .try_into()
                 .unwrap()
         );
