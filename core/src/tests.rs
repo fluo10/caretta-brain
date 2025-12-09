@@ -1,37 +1,70 @@
-use std::{marker::PhantomData, sync::LazyLock};
+use std::{marker::PhantomData, path::PathBuf, sync::{Arc, LazyLock}};
 
-use crate::{config::{P2pConfig, StorageConfig}, context::ServiceContext, entity::device_config};
+use crate::{config::{P2pConfig, StorageConfig}, entity::device_config, traits::{AsDatabaseConnection, AsIrohEndpoint}};
 use caretta_brain_migration::Migrator;
-use sea_orm::DatabaseConnection;
+use iroh::Endpoint;
+use n0_future::stream::Once;
+use sea_orm::{Database, DatabaseConnection};
 use tokio::sync::OnceCell;
 
-const TEST_APP_NAME: &str = "caretta-brain-test";
-
-pub static SERVICE_CONTEXT: OnceCell<ServiceContext> = OnceCell::const_new();
-pub async fn service_conext() -> &'static ServiceContext {
-    SERVICE_CONTEXT
-        .get_or_init(|| async move {
-            let test_dir = tempfile::Builder::new()
-                .prefix(TEST_APP_NAME)
-                .tempdir()
-                .unwrap()
-                .keep();
-            let data_dir = test_dir.join("data");
-            let cache_dir = test_dir.join("cache");
-            let storage_config = StorageConfig {
-                data_dir,
-                cache_dir,
-            };
-            let database_connection = storage_config.to_database_connection(Migrator).await;
-            let device_config = device_config::Model::get_or_try_init(&database_connection).await.unwrap();
-            let iroh_router = P2pConfig::from(device_config).to_iroh_router(TEST_APP_NAME).await.unwrap();
-            ServiceContext {
-                app_name: TEST_APP_NAME,
-                storage_config,
-                iroh_router,
-                database_connection,
-            }
-        })
-        .await
+static STORAGE_CONFIG: OnceCell<StorageConfig> = OnceCell::const_new();
+async fn storage_config() -> &'static StorageConfig {
+    STORAGE_CONFIG.get_or_init(|| async move {
+        let dir = tempfile::Builder::new()
+            .prefix("caretta_brain_test")
+            .tempdir()
+            .unwrap()
+            .keep();
+        let data_dir = dir.join("data");
+        let cache_dir = dir.join("cache");
+        StorageConfig { data_dir, cache_dir }
+    }).await
+}
+static P2P_CONFIG: OnceCell<P2pConfig> = OnceCell::const_new();
+async fn p2p_config() -> &'static P2pConfig {
+    P2P_CONFIG.get_or_init(|| async move {
+        P2pConfig::from(device_config().await.clone())
+    }).await
 }
 
+static DATABASE_CONNECTION: OnceCell<Arc<DatabaseConnection>> = OnceCell::const_new();
+
+async fn database_connection() -> &'static Arc<DatabaseConnection> {
+    DATABASE_CONNECTION.get_or_init(|| async move {
+        Arc::new(storage_config().await.to_database_connection(Migrator).await)
+    }).await
+}
+
+static DEVICE_CONFIG: OnceCell<device_config::Model> = OnceCell::const_new();
+
+async fn device_config() -> &'static device_config::Model {
+    DEVICE_CONFIG.get_or_init(|| async move {
+        device_config::Model::get_or_try_init(database_connection().await).await.unwrap()
+    }).await
+}
+pub struct TestContext{
+    pub database_connection: Arc<DatabaseConnection>,
+    pub iroh_endpoint: Endpoint
+}
+
+impl AsDatabaseConnection for TestContext {
+    fn as_database_connection(&self) -> &DatabaseConnection {
+        self.database_connection.as_ref()
+    }
+}
+
+impl AsIrohEndpoint for TestContext {
+    fn as_iroh_endpoint(&self) -> &iroh::Endpoint {
+        &self.iroh_endpoint
+    }
+}
+
+static TEST_CONTEXT: OnceCell<TestContext> = OnceCell::const_new();
+pub async fn context() -> &'static TestContext {
+    TEST_CONTEXT.get_or_init(|| async move {
+        TestContext {
+            database_connection: database_connection().await.clone(),
+            iroh_endpoint: p2p_config().await.spawn_iroh_endpoint().await.unwrap()
+        }
+    }).await
+}

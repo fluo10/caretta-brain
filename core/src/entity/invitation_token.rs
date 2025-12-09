@@ -1,9 +1,9 @@
 use caretta_id::CarettaId;
 use chrono::Local;
 use rand::Rng;
-use sea_orm::{ActiveValue, entity::prelude::* };
+use sea_orm::{ActiveValue, Database, entity::prelude::* };
 
-use crate::{context::ServiceContextExt, types::TokenStatus};
+use crate::{traits::AsDatabaseConnection, types::TokenStatus};
 
 #[sea_orm::model]
 #[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel)]
@@ -20,7 +20,7 @@ pub struct Model {
 impl Model {
     async fn new<C>(ctx: &C) -> Result<Self, DbErr> 
     where
-        C: ServiceContextExt
+        C: AsDatabaseConnection
     {
         ActiveModel {
             secret : ActiveValue::Set(rand::rng().random()),
@@ -32,7 +32,7 @@ impl Model {
     }
     async fn from_db<C>(ctx: &C, id: CarettaId) -> Result<Option<Self>, DbErr>
     where
-        C: ServiceContextExt
+        C: AsDatabaseConnection
     {
         Entity::find_by_id(id).one(ctx.as_database_connection()).await
     }
@@ -42,13 +42,11 @@ impl ActiveModelBehavior for ActiveModel {}
 
 #[cfg(test)]
 mod tests {
-    use crate::context::ServiceContextExt;
-
     use super::*;
 
     #[tokio::test]
     async fn insert_and_get_record() {
-        let ctx = crate::tests::service_conext().await;
+        let ctx = crate::tests::context().await;
         let model = Model::new(ctx).await.unwrap();
         assert_eq!(model, Model::from_db(ctx, model.id.clone()).await.unwrap().unwrap());
     }

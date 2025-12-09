@@ -7,11 +7,11 @@ license.workspace = true
 repository.workspace = true
 
 [features]
-service = []
+engine = []
 client = []
 desktop = []
-server = ["service"]
-mobile = ["service"]
+server = ["engine"]
+mobile = ["engine"]
 
 [dependencies]
 base32 = "0.5.1"
@@ -37,6 +37,8 @@ tracing-subscriber.workspace = true
 uuid = { version = "1.18.1", features = ["v7"] }
 gethostname = "1.1.0"
 async-trait.workspace = true
+iroh-blobs = "0.97.0"
+iroh-gossip = "0.95.0"
 
 [dev-dependencies]
 tempfile = "3.23.0"

@@ -1,6 +1,6 @@
 use sea_orm::{ActiveValue::Set, entity::prelude::*};
 
-use crate::{config::P2pConfig, types::EndpointSecretKey};
+use crate::{config::P2pConfig, traits::AsDatabaseConnection, types::EndpointSecretKey};
 
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel)]
@@ -16,7 +16,11 @@ pub struct Model {
 impl Model {
     const ID: u32 = 0;
 
-    pub async fn get_or_try_init(db: &DatabaseConnection) -> Result<Self, DbErr> {
+    pub async fn get_or_try_init<T>(ctx: &T) -> Result<Self, DbErr> 
+    where 
+        T: AsDatabaseConnection
+    {
+        let db = ctx.as_database_connection();
         if let Some(x) = Entity::find_by_id(Self::ID).one(db).await? {
             Ok(x)
         } else {
@@ -49,13 +53,11 @@ impl From<Model> for P2pConfig {
 
 #[cfg(test)]
 mod tests {
-    use crate::context::ServiceContextExt;
-
     use super::*;
 
     #[tokio::test]
     async fn insert_and_get_record() {
-        let db = crate::tests::service_conext().await.as_database_connection();
+        let db = crate::tests::context().await;
         let model = Model::get_or_try_init(db).await.unwrap();
         assert_eq!(model, Model::get_or_try_init(db).await.unwrap());
     }

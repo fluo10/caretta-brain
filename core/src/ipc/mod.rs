@@ -1,6 +1,7 @@
 mod actor;
 mod api;
 mod api_trait;
+mod context;
 mod error;
 mod protocol;
 
@@ -18,6 +19,7 @@ pub use error::*;
 pub use api::*;
 pub use api_trait::*;
 pub use actor::*;
+pub use context::*;
 pub use protocol::*;
 pub type IpcResult<T> = std::result::Result<T, IpcError>;
 pub type IpcActorResult<T> = std::result::Result<T, IpcActorError>;

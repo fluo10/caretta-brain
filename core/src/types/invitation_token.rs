@@ -1,7 +1,7 @@
-use crate::{context::ServiceContextExt, error::CoreError, types::{EndpointPublicKey, TryIntoEndpointPublicKeyError}};
+use crate::{error::CoreError, types::{EndpointPublicKey, TryIntoEndpointPublicKeyError}};
 use chrono::{DateTime, Duration, Local, SubsecRound, Utc};
 use iroh::{ EndpointId};
-use sea_orm::DbErr;
+use sea_orm::{DatabaseConnection, DbErr};
 use caretta_id::CarettaId;
 
 #[derive(Clone, Debug, PartialEq)]
@@ -63,7 +63,7 @@ impl InvitationToken {
     
     pub async fn new<T>(context: &T) -> Result<Self, DbErr> 
     where 
-    T: ServiceContextExt
+    T: AsRef<DatabaseConnection>
     {
         todo!()
     }

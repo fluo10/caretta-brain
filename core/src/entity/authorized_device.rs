@@ -2,7 +2,7 @@ use caretta_id::CarettaId;
 use chrono::{DateTime, Local};
 use sea_orm::{ActiveValue::{self, Set}, entity::prelude::*};
 
-use crate::{context::ServiceContextExt, types::{EndpointPublicKey, EndpointSecretKey}};
+use crate::{traits::{AsDatabaseConnection, AsIrohEndpoint}, types::{EndpointPublicKey, EndpointSecretKey}};
 
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel)]
@@ -20,12 +20,12 @@ pub struct Model {
 impl Model {
     async fn new<C>(ctx: &C) -> Result<Self, DbErr>
     where 
-        C: ServiceContextExt
+        C: AsDatabaseConnection + AsIrohEndpoint
     {
         ActiveModel {
             id: ActiveValue::Set(Uuid::now_v7()),
             public_id: ActiveValue::Set(CarettaId::now_unix()),
-            public_key: ActiveValue::Set(ctx.as_iroh_router().endpoint().id().into()),
+            public_key: ActiveValue::Set(ctx.as_iroh_endpoint().id().into()),
             name: ActiveValue::Set(gethostname::gethostname().to_string_lossy().to_string()),
             created_at: ActiveValue::Set(Local::now()),
             updated_at: ActiveValue::Set(Local::now()),
@@ -34,7 +34,7 @@ impl Model {
 
     async fn from_db<C>(ctx: &C, id: Uuid) -> Result<Option<Self>, DbErr> 
     where
-        C: ServiceContextExt
+        C: AsDatabaseConnection
     {
         Entity::find_by_id(id).one(ctx.as_database_connection()).await
 
@@ -48,13 +48,12 @@ impl ActiveModelBehavior for ActiveModel {}
 
 #[cfg(test)]
 mod tests {
-    use crate::context::ServiceContextExt;
 
     use super::*;
 
     #[tokio::test]
     async fn insert_and_get_record() {
-        let ctx = crate::tests::service_conext().await;
+        let ctx  = crate::tests::context().await;
         let model = Model::new(ctx).await.unwrap();
         assert_eq!(model, Model::from_db(ctx, model.id.clone()).await.unwrap().unwrap());
     }

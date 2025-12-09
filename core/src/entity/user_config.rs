@@ -1,6 +1,7 @@
 use sea_orm::{ActiveValue::Set, entity::prelude::*};
+use tracing_subscriber::registry::Data;
 
-use crate::{context::ServiceContextExt, types::{NamespacePublicKey, NamespaceSecretKey}};
+use crate::{traits::AsDatabaseConnection, types::{NamespacePublicKey, NamespaceSecretKey}};
 
 const ID: u32= 0;
 
@@ -16,21 +17,21 @@ impl Model {
     const ID: u32 = 0;
     pub async fn from_secret<C>(ctx: &C, namespace: NamespaceSecretKey) -> Result<Self, DbErr> 
     where 
-        C: ServiceContextExt
+        C: AsDatabaseConnection
     {
         todo!()
     }
 
     pub async fn new<C>(ctx: &C) -> Result<Self, DbErr>
     where 
-        C: ServiceContextExt
+        C: AsDatabaseConnection
     {
         todo!()
     }
 
     pub async fn get<C>(ctx: &C) -> Result<Option<Self>, DbErr>
     where 
-        C: ServiceContextExt
+        C: AsDatabaseConnection
     {
         Entity::find_by_id(Self::ID).one(ctx.as_database_connection()).await
     }
@@ -43,13 +44,11 @@ impl ActiveModelBehavior for ActiveModel {}
 
 #[cfg(test)]
 mod tests {
-    use crate::context::ServiceContextExt;
-
     use super::*;
 
     #[tokio::test]
     async fn insert_and_get_record() {
-        let ctx  = crate::tests::service_conext().await;
+        let ctx = crate::tests::context().await;
         let model = Model::new(ctx).await.unwrap();
         assert_eq!(model, Model::get(ctx).await.unwrap().unwrap());
     }

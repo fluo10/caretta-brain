@@ -16,10 +16,10 @@ pub struct StorageConfig {
 impl StorageConfig {
     const LOCAL_DATABASE_FILE_NAME: &str = "local.db";
     const CACHE_DATABASE_FILE_NAME: &str = "cache.db";
-    const DOCS_FILE_NAME: &str = "docs.bin";
+    const IROH_DIR_NAME: &str = "iroh";
 
-    pub fn to_docs_path(&self) -> PathBuf {
-        self.data_dir.join(Self::DOCS_FILE_NAME)
+    pub fn to_iroh_path(&self) -> PathBuf {
+        self.data_dir.join(Self::IROH_DIR_NAME)
     }
     // pub fn to_docs(&self) -> Result<Store, Error> {
     //     Ok(Store::persistent(self.to_docs_path()).map_err(|e| Error::DocsOpen(e))?)

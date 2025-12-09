@@ -6,8 +6,16 @@ use iroh::{
     },
     protocol::Router,
 };
+#[cfg(feature = "engine")]
+use iroh_blobs::BlobsProtocol;
+#[cfg(feature = "engine")]
+use iroh_docs::protocol::Docs;
+#[cfg(feature = "engine")]
+use iroh_gossip::Gossip;
 use serde::{Deserialize, Serialize};
 
+#[cfg(feature = "engine")]
+use crate::config::StorageConfig;
 use crate::{types::EndpointSecretKey, util::{Emptiable, Mergeable}};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -18,26 +26,40 @@ pub struct P2pConfig {
 }
 
 impl P2pConfig {
-    #[cfg(feature = "service")]
-    pub async fn to_iroh_router(
-        &self,
-        app_name: &'static str,
-    ) -> Result<Router, iroh::endpoint::BindError> {
+    #[cfg(feature = "engine")]
+    pub(crate) async fn spawn_iroh_endpoint(&self) -> Result<Endpoint, iroh::endpoint::BindError> {
         let mut endpoint = iroh::endpoint::Builder::empty(iroh::RelayMode::Disabled)
             .secret_key(self.secret_key.clone().into());
         if self.enable_n0 {
             endpoint = endpoint.discovery(DnsDiscovery::n0_dns());
         }
         if self.enable_mdns {
-            let mdns = MdnsDiscovery::builder().service_name(app_name);
+            use crate::APP_NAME;
+
+            let mdns = MdnsDiscovery::builder().service_name(APP_NAME);
             endpoint = endpoint.discovery(mdns);
         }
-        let ep = endpoint.bind().await?;
-        Ok(
-            Router::builder(ep)
-                .accept(iroh_ping::ALPN, iroh_ping::Ping::new())
-                .spawn(),
-        )
+        endpoint.bind().await
+    }
+    #[cfg(feature = "engine")]
+    pub async fn spawn_iroh_protocols(
+        &self,
+        storage_config: &StorageConfig
+    ) -> Result<(BlobsProtocol, Docs, Gossip), iroh::endpoint::BindError> {
+        use iroh_blobs::BlobsProtocol;
+        use iroh_gossip::Gossip;
+        let endpoint = self.spawn_iroh_endpoint().await.unwrap();
+
+        let iroh_dir = storage_config.to_iroh_path();
+        let blobs = iroh_blobs::store::fs::FsStore::load(&iroh_dir.join("blobs")).await.unwrap();
+        let gossip = Gossip::builder().spawn(endpoint.clone());
+        let docs = Docs::persistent(iroh_dir.join("docs")).spawn(endpoint.clone(), blobs.clone().into(), gossip.clone()).await.unwrap();
+
+        Ok((
+            BlobsProtocol::new(&blobs, None),
+            docs,
+            gossip,
+        ))
     }
 }
 

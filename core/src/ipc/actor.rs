@@ -1,21 +1,22 @@
 use std::{sync::Arc, time::Duration};
 
-use crate::{context::{ServiceContext, ServiceContextExt}, entity::{authorized_device, invitation_token}, ipc::{DevicePingRequest, DevicePingResponse, IpcActorError, IpcApi, IpcApiTrait, IpcError, IpcMessage}, types::{DeviceIdentifier, InvitationToken}};
+use crate::{entity::{authorized_device, invitation_token}, ipc::{DevicePingRequest, DevicePingResponse, IpcActorContext, IpcActorError, IpcApi, IpcApiTrait, IpcError, IpcMessage}, types::{DeviceIdentifier, InvitationToken}};
+use iroh::{Endpoint, discovery::Discovery};
 use irpc::{Client, Service, WithChannels};
 use n0_future::StreamExt;
 use tracing::info;
 
 pub struct IpcActor {
     recv: tokio::sync::mpsc::Receiver<IpcMessage>,
-    context: Arc<dyn AsRef<ServiceContext> + Sync + Send>
+    context: IpcActorContext
 }
 
 impl IpcActor {
-    pub fn spawn(context: &Arc<dyn AsRef<ServiceContext> + Sync + Send>) -> IpcApi {
+    pub fn spawn(context: IpcActorContext) -> IpcApi {
         let (tx, rx) = tokio::sync::mpsc::channel(1);
         let actor = Self {
             recv: rx,
-            context: context.clone()
+            context: context
         };
         n0_future::task::spawn(actor.run());
         IpcApi {
@@ -59,17 +60,14 @@ impl IpcApiTrait for IpcActor {
             .await
             .map_err(|e| IpcActorError::Internal(format!("{:?}", e).to_string()))?
             .ok_or(IpcActorError::DeviceNotFound(target.clone()))?;
-        let mut stream = self
-            .context
-            .as_ref()
-            .discover(public_key.into_inner())
-            .await
+        let endpoint: &Endpoint = self.context.as_ref();
+        let mut stream = endpoint.discovery().resolve(public_key.into_inner())
             .ok_or(IpcActorError::DeviceNotFound(target.clone()))?;
         if let Some(x) = stream.next().await {
             let discovered = x.map_err(|e| IpcActorError::Internal(format!("{:?}", e).to_string()))?;
             iroh_ping::Ping::new()
                 .ping(
-                    self.context.as_ref().as_endpoint(),
+                    <IpcActorContext as AsRef<Endpoint>>::as_ref(&self.context),
                     discovered.into_endpoint_addr(),
                 )
                 .await

@@ -1,7 +1,7 @@
 use caretta_id::CarettaId;
 use serde::{Deserialize, Serialize};
 
-#[cfg(feature = "service")]
+#[cfg(feature = "engine")]
 use crate::{ipc::IpcActorError, types::EndpointPublicKey};
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -11,7 +11,7 @@ pub enum DeviceIdentifier {
     PublicKey(EndpointPublicKey)
 }
 
-#[cfg(feature = "service")]
+#[cfg(feature = "engine")]
 impl DeviceIdentifier {
     pub async fn to_public_key<C>(&self, ctx: C) -> Result<Option<EndpointPublicKey>, IpcActorError> {
         match self {
