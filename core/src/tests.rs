@@ -1,7 +1,7 @@
 use std::{marker::PhantomData, path::PathBuf, sync::{Arc, LazyLock}};
 
-use crate::{config::{P2pConfig, StorageConfig}, entity::device_config, traits::{AsDatabaseConnection, AsIrohEndpoint}};
-use caretta_brain_migration::Migrator;
+use crate::{config::{P2pConfig, StorageConfig}, entity::device_config};
+use caretta_agent_migration::Migrator;
 use iroh::Endpoint;
 use n0_future::stream::Once;
 use sea_orm::{Database, DatabaseConnection};
@@ -11,7 +11,7 @@ static STORAGE_CONFIG: OnceCell<StorageConfig> = OnceCell::const_new();
 async fn storage_config() -> &'static StorageConfig {
     STORAGE_CONFIG.get_or_init(|| async move {
         let dir = tempfile::Builder::new()
-            .prefix("caretta_brain_test")
+            .prefix("caretta_agent_test")
             .tempdir()
             .unwrap()
             .keep();
@@ -31,7 +31,7 @@ static DATABASE_CONNECTION: OnceCell<Arc<DatabaseConnection>> = OnceCell::const_
 
 async fn database_connection() -> &'static Arc<DatabaseConnection> {
     DATABASE_CONNECTION.get_or_init(|| async move {
-        Arc::new(storage_config().await.to_database_connection(Migrator).await)
+        Arc::new(storage_config().await.to_database_connection().await)
     }).await
 }
 
@@ -47,14 +47,14 @@ pub struct TestContext{
     pub iroh_endpoint: Endpoint
 }
 
-impl AsDatabaseConnection for TestContext {
-    fn as_database_connection(&self) -> &DatabaseConnection {
+impl AsRef<DatabaseConnection> for TestContext {
+    fn as_ref(&self) -> &DatabaseConnection {
         self.database_connection.as_ref()
     }
 }
 
-impl AsIrohEndpoint for TestContext {
-    fn as_iroh_endpoint(&self) -> &iroh::Endpoint {
+impl AsRef<Endpoint> for TestContext {
+    fn as_ref(&self) -> &iroh::Endpoint {
         &self.iroh_endpoint
     }
 }

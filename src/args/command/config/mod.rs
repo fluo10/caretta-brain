@@ -1,4 +1,4 @@
-use caretta_brain_core::util::RunnableCommand;
+use caretta_agent_core::util::RunnableCommand;
 use clap::{Args, Subcommand};
 
 mod client;

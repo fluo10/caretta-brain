@@ -1,6 +1,6 @@
 use sea_orm::{ActiveValue::Set, entity::prelude::*};
 
-use crate::{config::P2pConfig, traits::AsDatabaseConnection, types::EndpointSecretKey};
+use crate::{config::P2pConfig, types::EndpointSecretKey};
 
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel)]
@@ -18,9 +18,9 @@ impl Model {
 
     pub async fn get_or_try_init<T>(ctx: &T) -> Result<Self, DbErr> 
     where 
-        T: AsDatabaseConnection
+        T: AsRef<DatabaseConnection>
     {
-        let db = ctx.as_database_connection();
+        let db = ctx.as_ref();
         if let Some(x) = Entity::find_by_id(Self::ID).one(db).await? {
             Ok(x)
         } else {

@@ -1,4 +1,4 @@
-# caretta-brain
+# caretta-agent
 Your AI-powered second brain with serverless sync
 
 ## Contribution

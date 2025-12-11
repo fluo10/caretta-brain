@@ -45,7 +45,7 @@ impl P2pConfig {
     pub async fn spawn_iroh_protocols(
         &self,
         storage_config: &StorageConfig
-    ) -> Result<(BlobsProtocol, Docs, Gossip), iroh::endpoint::BindError> {
+    ) -> Result<(Endpoint, BlobsProtocol, Docs, Gossip), iroh::endpoint::BindError> {
         use iroh_blobs::BlobsProtocol;
         use iroh_gossip::Gossip;
         let endpoint = self.spawn_iroh_endpoint().await.unwrap();
@@ -56,6 +56,7 @@ impl P2pConfig {
         let docs = Docs::persistent(iroh_dir.join("docs")).spawn(endpoint.clone(), blobs.clone().into(), gossip.clone()).await.unwrap();
 
         Ok((
+            endpoint, 
             BlobsProtocol::new(&blobs, None),
             docs,
             gossip,

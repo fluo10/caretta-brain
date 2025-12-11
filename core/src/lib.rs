@@ -1,4 +1,4 @@
-pub const APP_NAME: &str = "caretta-brain";
+pub const APP_NAME: &str = "caretta-agent";
 
 pub mod config;
 #[cfg(feature = "engine")]

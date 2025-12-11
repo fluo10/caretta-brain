@@ -6,23 +6,20 @@ mod ipc;
 mod storage;
 pub mod types;
 #[cfg(feature = "client")]
-use caretta_brain_core::context::ClientContext;
+use caretta_agent_core::context::ClientContext;
 #[cfg(feature = "server")]
-use caretta_brain_core::{
-    config::{P2pConfig, StorageConfig},
-    context::ServerContext,
+use caretta_agent_core::{
+    config::{P2pConfig, StorageConfig}, engine::Engine,
 };
 use clap::Args;
 pub use error::ParsedConfigError;
 pub use log::ParsedLogConfig;
 pub use p2p::ParsedP2pConfig;
 pub use ipc::ParsedIpcConfig;
-#[cfg(feature = "server")]
-use redb::Database;
 pub use storage::ParsedStorageConfig;
 use serde::{Deserialize, Serialize, ser::Error};
 
-use caretta_brain_core::{
+use caretta_agent_core::{
     config::{LogConfig, IpcConfig},
     util::{Emptiable, Mergeable},
 };
@@ -33,8 +30,6 @@ use std::{
     marker::PhantomData,
     path::{Path, PathBuf},
 };
-
-use crate::types::Verbosity;
 
 #[derive(Args, Clone, Debug, Default, Deserialize, Serialize)]
 pub struct ParsedConfig {
@@ -72,10 +67,11 @@ impl ParsedConfig {
 
     /// Fill empty configuration fields with database values
     #[cfg(feature = "server")]
-    pub fn with_local_database(mut self) -> Self {
-        use caretta_brain_service::local_data::LocalP2pConfigExt;
-        let db = self.to_storage_config().unwrap().to_local_database();
-        let p2p_config = P2pConfig::get_or_init_db(&db);
+    pub async fn with_database(mut self) -> Self {
+        use caretta_agent_core::entity::device_config;
+
+        let db = self.to_storage_config().unwrap().to_database_connection().await;
+        let p2p_config = P2pConfig::from(device_config::Model::get_or_try_init(&Box::new(db)).await.unwrap());
         self.merge(ParsedP2pConfig::from(p2p_config));
         self
     }
@@ -145,32 +141,21 @@ impl ParsedConfig {
     }
 
     #[cfg(feature = "server")]
-    pub async fn into_server_context(
+    pub async fn spawn_engine(
         self,
         app_name: &'static str,
-    ) -> Result<ServerContext, ParsedConfigError>
+    ) -> Result<Engine, ParsedConfigError>
     {
-        use caretta_brain_core::context::ServiceContext;
 
         let config = self.as_ref();
         let ipc_config = config.to_ipc_config()?;
         let p2p_config = config.to_p2p_config()?;
         let storage_config = config.to_storage_config()?;
-        let iroh_router = p2p_config.to_iroh_router(app_name).await.unwrap();
-        let local_database = storage_config.to_local_database();
-        let cache_database = storage_config.to_cache_database();
-        let service_context = ServiceContext {
-            app_name,
-            storage_config,
-            iroh_router,
-            local_database,
-            cache_database,
-        };
-        Ok(ServerContext {
-            app_name,
-            ipc_config,
-            service_context,
-        })
+        Ok(Engine::builder()
+            .p2p_config(p2p_config)
+            .storage_config(storage_config)
+            .ipc_config(ipc_config)
+            .spawn().await)
     }
     #[cfg(feature = "client")]
     pub fn into_client_context(

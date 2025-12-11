@@ -1,7 +1,7 @@
 use sea_orm::{ActiveValue::Set, entity::prelude::*};
 use tracing_subscriber::registry::Data;
 
-use crate::{traits::AsDatabaseConnection, types::{NamespacePublicKey, NamespaceSecretKey}};
+use crate::{types::{NamespacePublicKey, NamespaceSecretKey}};
 
 const ID: u32= 0;
 
@@ -17,23 +17,23 @@ impl Model {
     const ID: u32 = 0;
     pub async fn from_secret<C>(ctx: &C, namespace: NamespaceSecretKey) -> Result<Self, DbErr> 
     where 
-        C: AsDatabaseConnection
+        C: AsRef<DatabaseConnection>
     {
         todo!()
     }
 
     pub async fn new<C>(ctx: &C) -> Result<Self, DbErr>
     where 
-        C: AsDatabaseConnection
+        C: AsRef<DatabaseConnection>
     {
         todo!()
     }
 
     pub async fn get<C>(ctx: &C) -> Result<Option<Self>, DbErr>
     where 
-        C: AsDatabaseConnection
+        C: AsRef<DatabaseConnection>
     {
-        Entity::find_by_id(Self::ID).one(ctx.as_database_connection()).await
+        Entity::find_by_id(Self::ID).one(ctx.as_ref()).await
     }
 }
 

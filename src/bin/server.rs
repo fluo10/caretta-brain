@@ -1,3 +1,13 @@
+use caretta_agent::args::ConfigOptionArgs;
+use clap::Parser;
+
+#[derive(Debug, Parser)]
+struct Cli {
+    #[command(flatten)]
+    config: ConfigOptionArgs
+}
+
 fn main() {
-    println!("server")
+    let args = Cli::parse();
+    print!("{:?}", args)
 }

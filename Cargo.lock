@@ -480,11 +480,11 @@ dependencies = [
 ]
 
 [[package]]
-name = "caretta-brain"
+name = "caretta-agent"
 version = "0.0.0"
 dependencies = [
  "async-trait",
- "caretta-brain-core",
+ "caretta-agent-core",
  "chrono",
  "clap",
  "dirs",
@@ -499,12 +499,12 @@ dependencies = [
 ]
 
 [[package]]
-name = "caretta-brain-core"
+name = "caretta-agent-core"
 version = "0.0.0"
 dependencies = [
  "async-trait",
  "base32",
- "caretta-brain-migration",
+ "caretta-agent-migration",
  "caretta-id",
  "chrono",
  "ciborium",
@@ -531,7 +531,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "caretta-brain-migration"
+name = "caretta-agent-migration"
 version = "0.1.0"
 dependencies = [
  "sea-orm-migration",
@@ -539,10 +539,10 @@ dependencies = [
 ]
 
 [[package]]
-name = "caretta-brain-mobile"
+name = "caretta-agent-mobile"
 version = "0.0.0"
 dependencies = [
- "caretta-brain-core",
+ "caretta-agent-core",
 ]
 
 [[package]]

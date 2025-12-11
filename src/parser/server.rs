@@ -1,7 +1,7 @@
 use std::marker::PhantomData;
 
-use caretta_brain_core::{context::ServerContext, util::RunnableCommand};
-use caretta_brain_service::server::ServerTrait;
+use caretta_agent_core::{context::ServerContext, util::RunnableCommand};
+use caretta_agent_service::server::ServerTrait;
 use clap::Parser;
 
 use crate::{

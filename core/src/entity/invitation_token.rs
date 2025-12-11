@@ -3,7 +3,7 @@ use chrono::Local;
 use rand::Rng;
 use sea_orm::{ActiveValue, Database, entity::prelude::* };
 
-use crate::{traits::AsDatabaseConnection, types::TokenStatus};
+use crate::{types::TokenStatus};
 
 #[sea_orm::model]
 #[derive(Clone, Debug, PartialEq, Eq, DeriveEntityModel)]
@@ -20,7 +20,7 @@ pub struct Model {
 impl Model {
     async fn new<C>(ctx: &C) -> Result<Self, DbErr> 
     where
-        C: AsDatabaseConnection
+        C: AsRef<DatabaseConnection>
     {
         ActiveModel {
             secret : ActiveValue::Set(rand::rng().random()),
@@ -28,13 +28,13 @@ impl Model {
             closed_at : ActiveValue::Set(None),
             status: ActiveValue::Set(TokenStatus::Pending),
             ..Default::default()
-        }.insert(ctx.as_database_connection()).await
+        }.insert(ctx.as_ref()).await
     }
     async fn from_db<C>(ctx: &C, id: CarettaId) -> Result<Option<Self>, DbErr>
     where
-        C: AsDatabaseConnection
+        C: AsRef<DatabaseConnection>
     {
-        Entity::find_by_id(id).one(ctx.as_database_connection()).await
+        Entity::find_by_id(id).one(ctx.as_ref()).await
     }
 }
 

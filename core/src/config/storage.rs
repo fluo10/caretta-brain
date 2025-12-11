@@ -2,6 +2,7 @@ use std::{marker::PhantomData, path::{Path, PathBuf}};
 
 use crate::util::{Emptiable, Mergeable};
 
+use caretta_agent_migration::Migrator;
 use sea_orm::{Database, DatabaseConnection, sqlx::sqlite::SqliteConnectOptions};
 use sea_orm_migration::MigratorTrait;
 #[cfg(any(test, feature = "test"))]
@@ -42,13 +43,10 @@ impl StorageConfig {
     ///
     /// # Panic
     /// If initialize database is failed, then panic.
-    pub async fn to_database_connection<M>(&self, _: M) -> DatabaseConnection
-    where
-        M: MigratorTrait
-    {
+    pub async fn to_database_connection(&self) -> DatabaseConnection {
         let options = ["sqlite://", &self.to_database_path().to_string_lossy(), "?mode=rwc"].join("");
         let db = Database::connect(&options).await.expect("Failed to open database file");
-        M::up(&db, None).await.expect("Failed to migrate database");
+        Migrator::up(&db, None).await.expect("Failed to migrate database");
         db
     }
 }

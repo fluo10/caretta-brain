@@ -1,4 +1,4 @@
-use caretta_brain_core::{ipc::DeviceIdentifier, util::{decode_base32, encode_base32}};
+use caretta_agent_core::{ipc::DeviceIdentifier, util::{decode_base32, encode_base32}};
 use clap::Args;
 use caretta_id::CarettaId;
 use iroh::PublicKey;

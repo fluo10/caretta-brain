@@ -1,6 +1,6 @@
 use std::marker::PhantomData;
 
-use caretta_brain_core::util::RunnableCommand;
+use caretta_agent_core::util::RunnableCommand;
 use clap::Args;
 
 use crate::args::ConfigArgs;

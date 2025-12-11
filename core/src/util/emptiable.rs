@@ -1,5 +1,5 @@
 #[cfg(feature = "macros")]
-pub use caretta_brain_macros::Emptiable;
+pub use caretta_agent_macros::Emptiable;
 use std::collections::{HashMap, HashSet};
 
 pub trait Emptiable {
