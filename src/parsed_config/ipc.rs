@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 use url::Url;
 
 use crate::parsed_config::error::ParsedConfigError;
-use caretta_brain_core::{
+use caretta_agent_core::{
     config::{IpcConfig,},
     util::{Emptiable, Mergeable},
 };

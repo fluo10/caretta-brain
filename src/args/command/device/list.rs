@@ -1,8 +1,8 @@
-use caretta_brain_core::util::RunnableCommand;
+use caretta_agent_core::util::RunnableCommand;
 use clap::Args;
 
 use crate::args::{ConfigArgs, DeviceIdentifierArgs};
-use caretta_brain_core::{
+use caretta_agent_core::{
     context::ClientContext,
 };
 use caretta_id::CarettaId;

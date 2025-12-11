@@ -1,4 +1,4 @@
-use caretta_brain::args::ConfigOptionArgs;
+use caretta_agent::args::ConfigOptionArgs;
 use clap::Parser;
 
 #[derive(Debug, Parser)]

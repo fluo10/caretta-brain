@@ -2,7 +2,7 @@ use std::{marker::PhantomData, path::{Path, PathBuf}};
 
 use crate::util::{Emptiable, Mergeable};
 
-use caretta_brain_migration::Migrator;
+use caretta_agent_migration::Migrator;
 use sea_orm::{Database, DatabaseConnection, sqlx::sqlite::SqliteConnectOptions};
 use sea_orm_migration::MigratorTrait;
 #[cfg(any(test, feature = "test"))]

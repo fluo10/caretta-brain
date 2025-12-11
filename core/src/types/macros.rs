@@ -12,7 +12,7 @@ macro_rules! def_new_type {
         /// ## Sea ORM
         /// ```
         /// # use sea_orm::entity::prelude::*;
-        #[doc = concat!("use caretta_brain::types::", stringify!($Inner), ";")]
+        #[doc = concat!("use caretta_agent::types::", stringify!($Inner), ";")]
         /// #[derive(Clone, Debug, PartialEq, DeriveEntityModel)]
         /// #[sea_orm(table_name = "example")]
         /// pub struct Model {

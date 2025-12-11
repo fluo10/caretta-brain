@@ -2,5 +2,5 @@ use sea_orm_migration::prelude::*;
 
 #[tokio::main]
 async fn main() {
-    cli::run_cli(caretta_brain_migration::Migrator).await;
+    cli::run_cli(caretta_agent_migration::Migrator).await;
 }

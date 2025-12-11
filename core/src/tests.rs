@@ -1,7 +1,7 @@
 use std::{marker::PhantomData, path::PathBuf, sync::{Arc, LazyLock}};
 
 use crate::{config::{P2pConfig, StorageConfig}, entity::device_config};
-use caretta_brain_migration::Migrator;
+use caretta_agent_migration::Migrator;
 use iroh::Endpoint;
 use n0_future::stream::Once;
 use sea_orm::{Database, DatabaseConnection};
@@ -11,7 +11,7 @@ static STORAGE_CONFIG: OnceCell<StorageConfig> = OnceCell::const_new();
 async fn storage_config() -> &'static StorageConfig {
     STORAGE_CONFIG.get_or_init(|| async move {
         let dir = tempfile::Builder::new()
-            .prefix("caretta_brain_test")
+            .prefix("caretta_agent_test")
             .tempdir()
             .unwrap()
             .keep();

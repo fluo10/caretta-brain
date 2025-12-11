@@ -1,11 +1,11 @@
 use std::net::{Ipv4Addr, Ipv6Addr, SocketAddr, SocketAddrV4, SocketAddrV6};
 
-use caretta_brain_core::{ipc::IpcApi, util::RunnableCommand};
+use caretta_agent_core::{ipc::IpcApi, util::RunnableCommand};
 use clap::Args;
 use irpc::util::{make_client_endpoint, make_insecure_client_endpoint};
 
 use crate::args::{ConfigArgs, DeviceIdentifierArgs};
-use caretta_brain_core::{
+use caretta_agent_core::{
     context::{self, ClientContext},
 };
 

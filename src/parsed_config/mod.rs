@@ -6,9 +6,9 @@ mod ipc;
 mod storage;
 pub mod types;
 #[cfg(feature = "client")]
-use caretta_brain_core::context::ClientContext;
+use caretta_agent_core::context::ClientContext;
 #[cfg(feature = "server")]
-use caretta_brain_core::{
+use caretta_agent_core::{
     config::{P2pConfig, StorageConfig}, engine::Engine,
 };
 use clap::Args;
@@ -19,7 +19,7 @@ pub use ipc::ParsedIpcConfig;
 pub use storage::ParsedStorageConfig;
 use serde::{Deserialize, Serialize, ser::Error};
 
-use caretta_brain_core::{
+use caretta_agent_core::{
     config::{LogConfig, IpcConfig},
     util::{Emptiable, Mergeable},
 };
@@ -68,7 +68,7 @@ impl ParsedConfig {
     /// Fill empty configuration fields with database values
     #[cfg(feature = "server")]
     pub async fn with_database(mut self) -> Self {
-        use caretta_brain_core::entity::device_config;
+        use caretta_agent_core::entity::device_config;
 
         let db = self.to_storage_config().unwrap().to_database_connection().await;
         let p2p_config = P2pConfig::from(device_config::Model::get_or_try_init(&Box::new(db)).await.unwrap());

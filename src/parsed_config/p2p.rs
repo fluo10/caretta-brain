@@ -2,7 +2,7 @@ use clap::Args;
 use serde::{Deserialize, Serialize};
 
 use crate::parsed_config::error::ParsedConfigError;
-use caretta_brain_core::{
+use caretta_agent_core::{
     types::{EndpointPublicKey, EndpointSecretKey}, util::{Emptiable, Mergeable}
 };
 
@@ -60,7 +60,7 @@ mod server {
     use std::array::TryFromSliceError;
 
     use super::*;
-    use caretta_brain_core::config::P2pConfig;
+    use caretta_agent_core::config::P2pConfig;
     use iroh::SecretKey;
     impl TryFrom<ParsedP2pConfig> for P2pConfig {
         type Error = ParsedConfigError;

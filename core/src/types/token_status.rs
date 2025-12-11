@@ -1,6 +1,6 @@
 use std::{fmt::Display, str::FromStr};
 
-use caretta_brain_migration::Token;
+use caretta_agent_migration::Token;
 use sea_orm::{DeriveActiveEnum, EnumIter};
 use serde::Serialize;
 

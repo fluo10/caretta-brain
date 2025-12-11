@@ -1,4 +1,4 @@
-use caretta_brain_core::{
+use caretta_agent_core::{
     config::LogConfig,
     util::{Emptiable, Mergeable},
 };
