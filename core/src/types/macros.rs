@@ -257,6 +257,21 @@ macro_rules! impl_iroh_secret_key {
                 Ok(Self::from_bytes(&slice))
             }
         }
+        
+        impl std::fmt::Display for $SelfT {
+            fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+                write!(f, "{}", &crate::util::encode_base32(&self.to_bytes()))
+            }
+        }
+
+        impl std::str::FromStr for $SelfT {
+            type Err = $TryIntoError;
+            fn from_str(s: &str) -> Result<Self, Self::Err> {
+                let v = crate::util::decode_base32(s)?;
+                let slice: &[u8;32] = v.as_slice().try_into()?;
+                Ok(<$SelfT>::from_bytes(slice))
+            }
+        }
 
         impl TryGetable for $SelfT {
             fn try_get_by<I: sea_orm::ColIdx>(

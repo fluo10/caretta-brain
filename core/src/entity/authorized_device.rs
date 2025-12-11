@@ -1,8 +1,9 @@
 use caretta_id::CarettaId;
 use chrono::{DateTime, Local};
+use iroh::Endpoint;
 use sea_orm::{ActiveValue::{self, Set}, entity::prelude::*};
 
-use crate::{traits::{AsDatabaseConnection, AsIrohEndpoint}, types::{EndpointPublicKey, EndpointSecretKey}};
+use crate::{types::{EndpointPublicKey, EndpointSecretKey}};
 
 
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel)]
@@ -20,23 +21,23 @@ pub struct Model {
 impl Model {
     async fn new<C>(ctx: &C) -> Result<Self, DbErr>
     where 
-        C: AsDatabaseConnection + AsIrohEndpoint
+        C: AsRef<DatabaseConnection> + AsRef<Endpoint>
     {
         ActiveModel {
             id: ActiveValue::Set(Uuid::now_v7()),
             public_id: ActiveValue::Set(CarettaId::now_unix()),
-            public_key: ActiveValue::Set(ctx.as_iroh_endpoint().id().into()),
+            public_key: ActiveValue::Set(<C as AsRef<Endpoint>>::as_ref(ctx).id().into()),
             name: ActiveValue::Set(gethostname::gethostname().to_string_lossy().to_string()),
             created_at: ActiveValue::Set(Local::now()),
             updated_at: ActiveValue::Set(Local::now()),
-        }.insert(ctx.as_database_connection()).await
+        }.insert(<C as AsRef<DatabaseConnection>>::as_ref(ctx)).await
     }
 
     async fn from_db<C>(ctx: &C, id: Uuid) -> Result<Option<Self>, DbErr> 
     where
-        C: AsDatabaseConnection
+        C: AsRef<DatabaseConnection>
     {
-        Entity::find_by_id(id).one(ctx.as_database_connection()).await
+        Entity::find_by_id(id).one(ctx.as_ref()).await
 
     }
 }

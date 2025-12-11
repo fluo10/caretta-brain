@@ -10,6 +10,7 @@ exclude = [".gitignore"]
 [[bin]]
 name = "caretta-brain-server"
 path = "src/bin/server.rs"
+required-features = ["server"]
 
 [[bin]]
 name = "cbcli"
@@ -21,12 +22,13 @@ path = "src/bin/gui.rs"
 
 [features]
 cli = []
-server = []
+engine = ["caretta-brain-core/engine"]
+server = ["caretta-brain-core/server", "engine"]
 gui = []
 
 [dependencies]
 async-trait.workspace = true
-caretta-brain-core.workspace = true
+caretta-brain-core = { workspace = true, features = ["desktop"] }
 chrono.workspace = true
 clap = { version = "4.5.53", features = ["derive"] }
 dirs = "6.0.0"

@@ -1,6 +1,6 @@
 use std::{sync::Arc, time::Duration};
 
-use crate::{entity::{authorized_device, invitation_token}, ipc::{DevicePingRequest, DevicePingResponse, IpcActorContext, IpcActorError, IpcApi, IpcApiTrait, IpcError, IpcMessage}, types::{DeviceIdentifier, InvitationToken}};
+use crate::{entity::{authorized_device, invitation_token}, ipc::{DevicePingRequest, DevicePingResponse, IpcContext, IpcActorError, IpcApi, IpcApiTrait, IpcError, IpcMessage}, types::{DeviceIdentifier, InvitationToken}};
 use iroh::{Endpoint, discovery::Discovery};
 use irpc::{Client, Service, WithChannels};
 use n0_future::StreamExt;
@@ -8,11 +8,11 @@ use tracing::info;
 
 pub struct IpcActor {
     recv: tokio::sync::mpsc::Receiver<IpcMessage>,
-    context: IpcActorContext
+    context: IpcContext
 }
 
 impl IpcActor {
-    pub fn spawn(context: IpcActorContext) -> IpcApi {
+    pub fn spawn(context: IpcContext) -> IpcApi {
         let (tx, rx) = tokio::sync::mpsc::channel(1);
         let actor = Self {
             recv: rx,
@@ -67,7 +67,7 @@ impl IpcApiTrait for IpcActor {
             let discovered = x.map_err(|e| IpcActorError::Internal(format!("{:?}", e).to_string()))?;
             iroh_ping::Ping::new()
                 .ping(
-                    <IpcActorContext as AsRef<Endpoint>>::as_ref(&self.context),
+                    <IpcContext as AsRef<Endpoint>>::as_ref(&self.context),
                     discovered.into_endpoint_addr(),
                 )
                 .await
