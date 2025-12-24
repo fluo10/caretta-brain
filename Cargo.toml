@@ -15,15 +15,16 @@ required-features = ["server"]
 [[bin]]
 name = "cbcli"
 path = "src/bin/cli.rs"
+required-features = ["cli"]
 
 [[bin]]
 name = "caretta-agent"
 path = "src/bin/gui.rs"
+required-features = ["gui"]
 
 [features]
 cli = []
-engine = ["caretta-agent-core/engine"]
-server = ["caretta-agent-core/server", "engine"]
+server = []
 gui = []
 
 [dependencies]
@@ -56,6 +57,7 @@ repository = "https://github.com/fluo10/caretta-agent"
 async-trait = "0.1.89"
 caretta-agent-core = {path = "core", version = "0.0.0"}
 caretta-agent-migration = {path = "migration", version = "0.1.0"}
+caretta-sync = { git = "https://github.com/fluo10/caretta-sync"}
 chrono = { version = "0.4.42", features = ["serde"] }
 iroh = { version = "0.95.1", features = [ "discovery-local-network", "discovery-pkarr-dht" ] }
 sea-orm-migration = { version = "2.0.0-rc", features = [ "runtime-tokio-rustls", "sqlx-postgres" ] }

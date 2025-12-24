@@ -9,13 +9,9 @@ pub struct Model {
     pub id: Uuid,
     //pub public_id: CarettaId,
     pub title: String,
-    #[sea_orm(has_many, via = "tag_thread")]
-    pub tags: HasMany<super::tag::Entity>,
     #[sea_orm(has_many)]
     pub messages: HasMany<super::message::Entity>,
     pub workspace_id: Uuid,
-    #[sea_orm(belongs_to, from = "workspace_id", to = "id")]
-    pub workspace: HasOne<super::workspace::Entity>,
 }
 
 impl ActiveModelBehavior for ActiveModel {}

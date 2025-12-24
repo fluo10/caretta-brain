@@ -1,7 +1,12 @@
-mod config;
-mod device;
-mod token;
+use clap::Subcommand;
 
-pub use config::ConfigCommandArgs;
-pub use device::DeviceCommandArgs;
-pub use token::TokenCommandArgs;
+mod chat;
+
+
+pub struct AppCommandArgs {
+    command: AppSubcommand
+}
+#[derive(Subcommand)]
+pub enum AppSubcommand {
+    
+}

@@ -9,6 +9,7 @@ impl MigrationTrait for Migration {
         match manager.get_database_backend() {
             DatabaseBackend::Sqlite => {
                 let db = manager.get_connection();
+                todo!();
                 db.execute_unprepared(
                     "CREATE TABLE invitation_token (
                         id             INTEGER PRIMARY KEY,
@@ -16,26 +17,6 @@ impl MigrationTrait for Migration {
                         created_at     TEXT NOT NULL,
                         closed_at      TEXT,
                         status         INTEGER NOT NULL
-                    )",
-                )
-                .await?;
-                db.execute_unprepared(
-                    "CREATE TABLE authorized_device (
-                        id                       BLOB PRIMARY KEY,
-                        public_id                INTEGER NOT NULL UNIQUE,
-                        public_key               BLOB NOT NULL UNIQUE,
-                        name                     TEXT NOT NULL,
-                        created_at               TEXT NOT NULL,
-                        updated_at               TEXT NOT NULL
-                    )",
-                )
-                .await?;
-                db.execute_unprepared(
-                    "CREATE TABLE device_config (
-                        id INTEGER PRIMARY KEY CHECK (id = 0),
-                        iroh_endpoint_secret  BLOB NOT NULL,
-                        iroh_enable_n0   BOOL NOT NULL,
-                        iroh_enable_mdns BOOL NOT NULL
                     )",
                 )
                 .await?;

@@ -1,7 +1,5 @@
-#[cfg(feature = "client")]
-mod command;
-mod option;
+#[cfg(feature = "cli")]
+mod subcommand;
 
-#[cfg(feature = "client")]
-pub use command::*;
-pub use option::*;
+#[cfg(feature = "cli")]
+pub use subcommand::*;
